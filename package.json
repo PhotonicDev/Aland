@@ -1,0 +1,29 @@
+{
+  "name": "ai-narrative-game",
+  "version": "1.0.0",
+  "description": "An AI-powered narrative game with dynamic NPCs and reality switching",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "ollama": "^0.5.16",
+    "zod": "^3.22.4",
+    "express-ws": "^5.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "nodemonConfig": {
+    "ext": "js,json",
+    "watch": ["src/"],
+    "ignore": ["src/**/*.test.js"]
+  }
+}
