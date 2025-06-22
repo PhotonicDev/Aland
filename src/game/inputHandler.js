@@ -20,13 +20,7 @@ const handleUserInput = async (input, ollama) => {
     // Check if input might be trying to break constraints (only for non-command input)
     if (!input.trim().startsWith('/')) {
       const constraintCheck = await checkConstraints(input, ollama);
-      if (constraintCheck.violation) {
-        return {
-          type: 'WARNING',
-          message: `⚠️ ${constraintCheck.message}`,
-          originalInput: input
-        };
-      }
+      input = JSON.stringify(constraintCheck)
     }
     
     // Process the input (this will handle both commands and narration)
