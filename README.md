@@ -55,3 +55,14 @@ An interactive storytelling game where the AI serves as both narrator and NPCs, 
 ## License
 
 ISC
+
+
+## TODO:
+
+- Add more scenarios
+- Add NPC's 
+- Add more realities
+- Better narration prompting
+- Change realities should only happen under very specific conditions
+- Add images to terminal
+
