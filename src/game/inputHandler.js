@@ -17,13 +17,24 @@ const handleUserInput = async (input, ollama) => {
       return handleCommand({ command: 'help' }, ollama);
     }
 
-    // Check if input might be trying to break constraints (only for non-command input)
-    if (!input.trim().startsWith('/')) {
-      const constraintCheck = await checkConstraints(input, ollama);
-      input = JSON.stringify(constraintCheck)
+    // Check if input is a command
+    if (input.trim().startsWith('/')) {
+      return await processNarration(input, ollama);
     }
     
-    // Process the input (this will handle both commands and narration)
+    // Check constraints for non-command input
+    const constraintCheck = await checkConstraints(input, ollama);
+    
+    // If there's a violation, pass it to the narrator with the original input
+    if (constraintCheck.violation) {
+      return await processNarration({
+        type: 'constraint_violation',
+        originalInput: input,
+        violation: constraintCheck
+      }, ollama);
+    }
+    
+    // Otherwise, process the input normally
     return await processNarration(input, ollama);
   } catch (error) {
     console.error('Error handling user input:', error);
@@ -82,7 +93,18 @@ const parseCommand = (input) => {
 };
 
 const processNarration = async (input, ollama) => {
-  // Check for commands first
+  // Handle constraint violations
+  if (input && typeof input === 'object' && input.type === 'constraint_violation') {
+    return await generateNarration(
+      input, // Pass the full violation object
+      ollama,
+      gameState.currentScenario,
+      gameState.currentReality,
+      gameState
+    );
+  }
+  
+  // Check for commands
   const command = parseCommand(input);
   if (command) {
     return await handleCommand(command, ollama);

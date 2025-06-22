@@ -10,6 +10,34 @@ const { streamOllamaResponse } = require('../utils/streaming');
  * @returns {string} The prompt for the narrator.
  */
 const getNarrationPrompt = (scenario, reality, input) => {
+  // Handle constraint violations with a fun, narrative response
+  if (input && typeof input === 'object' && input.type === 'constraint_violation') {
+    const violation = input.violation;
+    return `You are the narrator of an interactive story. The player just tried to do something that breaks the game rules:
+
+Player's Attempt: "${input.originalInput}"
+Violation: ${violation.reason}
+Severity: ${violation.severity || 'moderate'}
+
+Respond by:
+1. Playfully scolding the player for trying to break the rules
+2. Describing how their attempt fails in a humorous or absurd way
+3. Suggesting what they could do instead
+4. Keeping it light-hearted and fun, but making it clear they can't do that
+
+Examples:
+- "You try to ${input.originalInput.toLowerCase()} but suddenly forget how to do that. Maybe it's the altitude?"
+- "As you attempt to ${input.originalInput.toLowerCase()}, a butterfly lands on your nose, completely distracting you."
+- "The universe seems to reject your attempt to ${input.originalInput.toLowerCase()}. It's almost like the very fabric of reality is working against you."
+
+Respond with a JSON object containing:
+{
+  "narration": "Your humorous response to the player's failed attempt",
+  "suggestedActions": ["suggested action 1", "suggested action 2", "..."]
+}`;
+  }
+  
+  // Normal narration prompt
   return `You are the narrator of an interactive story. Respond to the player's actions in a way that advances the narrative while maintaining the tone and setting of the current scenario.
 
 Current Scenario: ${scenario || 'Unknown'}
@@ -77,16 +105,6 @@ const generateNarration = async (input, ollama, scenario = null, reality = null,
       type: 'NARRATION',
       narration: 'The narrator seems to be lost in thought... (Ollama service not available)',
       suggestedActions: ['Try again later', 'Check Ollama service'],
-      timestamp: new Date().toISOString()
-    };
-  }
-
-  // Validate input
-  if (!input || typeof input !== 'string' || input.trim() === '') {
-    return {
-      type: 'NARRATION',
-      narration: 'The narrator waits patiently for your input...',
-      suggestedActions: ['Look around', 'Check inventory', 'Ask for help'],
       timestamp: new Date().toISOString()
     };
   }
